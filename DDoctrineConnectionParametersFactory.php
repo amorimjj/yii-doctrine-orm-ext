@@ -26,6 +26,8 @@ class DDoctrineConnectionParametersFactory {
         {
             case 'mysql':
                 return self::getMysqlConnectionParms($connection);
+            case 'sqlite':
+                return self::getSqliteConnectionParms($connection);
             default:
                 throw new CDbException('DDocrine not implementend to ' . $connection->driverName);
         }
@@ -55,6 +57,20 @@ class DDoctrineConnectionParametersFactory {
                 'password' => $connection->password,
                 'port' => $port,
                 'driver' => 'pdo_mysql'
+        );
+    }
+    
+    /**
+     * @param CDbConnection $connection
+     * @return array
+     */
+    protected static function getSqliteConnectionParms(CDbConnection $connection)
+    {
+        $path = str_replace('sqlite:', '', $connection->connectionString);
+        
+        return array(
+                'path' => $path,
+                'driver' => 'pdo_sqlite'
         );
     }
 }

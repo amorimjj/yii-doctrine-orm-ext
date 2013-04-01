@@ -11,8 +11,8 @@
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 
-Yii::import('ext.doctrineOrm.DDoctrineAutoload');
-Yii::import('ext.doctrineOrm.DDoctrineConnectionParametersFactory');
+Yii::import('ext.doctrineContainer.DDoctrineAutoload');
+Yii::import('ext.doctrineContainer.DDoctrineConnectionParametersFactory');
 
 class DDoctrineContainer extends CApplicationComponent {
     
