@@ -24,6 +24,8 @@ class DDoctrineContainer extends CApplicationComponent {
     
     private static $_mappingTypes = array('annotation', 'xml', 'yaml');
     
+    private static $_entityManager;
+    
     public function setConnectionId($connectionId)
     {
         self::$_connectionId = $connectionId;
@@ -65,8 +67,13 @@ class DDoctrineContainer extends CApplicationComponent {
     
     public function getEntityManager()
     {
-        $conn = DDoctrineConnectionParametersFactory::getConnectionParams(Yii::app()->{self::$_connectionId});
-        return EntityManager::create($conn, $this->getConfig());
+        if ( self::$_entityManager == null )
+        {
+            $conn = DDoctrineConnectionParametersFactory::getConnectionParams(Yii::app()->{self::$_connectionId});
+            self::$_entityManager = EntityManager::create($conn, $this->getConfig());
+            DDoctrineConnectionParametersFactory::createConnectionSessionInit(self::$_entityManager->getEventManager());
+        }
+        return elf::$_entityManager;
     }
     
     public function init()

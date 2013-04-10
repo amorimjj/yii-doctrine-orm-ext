@@ -9,6 +9,16 @@
  */
 class DDoctrineConnectionParametersFactory {
     
+    private static $_conn;
+    
+    protected static function getDriveName()
+    {
+        if ( ! self::$_conn )
+            throw new ErrorException('Connection was not setted');
+        
+        return self::$_conn->driverName;
+    }
+    
     public static function getDataFromConnectionString($connectionString, $data)
     {
         $matches = array();
@@ -16,12 +26,14 @@ class DDoctrineConnectionParametersFactory {
         return array_key_exists($data, $matches) ? $matches[$data] : false;
     }
 
-        /**
+    /**
      * @param CDbConnection $connection
      * @return array
      */
     public static function getConnectionParams(CDbConnection $connection)
     {
+        self::$_conn = $connection;
+        
         switch ($connection->driverName)
         {
             case 'mysql':
@@ -30,6 +42,26 @@ class DDoctrineConnectionParametersFactory {
                 return self::getSqliteConnectionParms($connection);
             default:
                 throw new CDbException('DDocrine not implementend to ' . $connection->driverName);
+        }
+    }
+    
+    protected static function createMysqlConnectionSessionInit(\Doctrine\Common\EventManager $eventManager)
+    {
+        if ( self::$_conn->charset == 'utf8')
+            $eventManager->addEventSubscriber(new \Doctrine\DBAL\Event\Listeners\MysqlSessionInit('utf8', 'utf8_unicode_ci'));   
+    }
+
+    public static function createConnectionSessionInit(\Doctrine\Common\EventManager $eventManager)
+    {
+        switch (self::getDriveName())
+        {
+            case 'mysql':
+                self::createMysqlConnectionSessionInit($eventManager);
+                break;
+            case 'sqlite':
+                break;
+            default:
+                throw new CDbException('DDocrine not implementend to ' . self::$_conn->driverName);
         }
     }
     
